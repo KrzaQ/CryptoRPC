@@ -61,25 +61,6 @@ private string makeParamsStruct(alias func)()
 	return structDef;
 }
 
-private string explodeParamsStruct(alias func, string structName)()
-{
-	import std.traits;
-	alias ParamNames = ParameterIdentifierTuple!func;
-	alias ParamTypes = Parameters!func;
-
-	static assert(ParamNames.length == ParamTypes.length);
-
-	static if(ParamTypes.length == 0){
-		return "";
-	}else{
-		string ret = structName ~ "." ~ ParamNames[0];
-		foreach(i, m; ParamNames[1..$]){
-			ret ~= ", " ~ structName ~ "." ~ m;
-		}
-		return ret;
-	}
-}
-
 void registerFunction(alias func)()
 {
 	import std.traits;
@@ -98,16 +79,21 @@ void registerFunction(alias func)()
 		import std.conv;
 		ParamStruct params = fromJSON!ParamStruct(parseJSON(json));
 
-		immutable string call = `func(` ~ explodeParamsStruct!(func, "params") ~ `)`;
+		alias ParamTypes = Parameters!func;
+		ParamTypes ps;
+
+		foreach(i, string fldname; __traits(allMembers, ParamStruct)){
+			ps[i] = __traits(getMember, params, fldname);
+		}
 
 		alias ResultOf = ReturnType!func;
 
 		static if(is(ResultOf == void)){
 			Result!string res;
-			mixin(call);
+			func(ps);
 		}else{
 			Result!ResultOf res;
-			res.Result = mixin(call);
+			res.Result = func(ps);
 		}
 		return res.toJSON.to!string;
 	};
