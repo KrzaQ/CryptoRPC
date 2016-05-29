@@ -26,12 +26,12 @@ void main()
 		"value": 21
 	}};
 
-	auto powResult = deserializer.call("pow", powInput);
+	auto powResult = "pow".call(powInput);
 	auto midResult = deserializer.call("makeItDouble", midInput);
 
 	powResult.writeln;
 	midResult.writeln;
-	
+
 	assert(powResult == `{"Result":1024}`);
 	assert(midResult == `{"Result":42}`);
 }

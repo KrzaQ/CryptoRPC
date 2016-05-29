@@ -87,15 +87,9 @@ void registerFunction(alias func)()
 
 	static if(UDAs.length == 1){
 		string name = UDAs[0].name;
-		//pragma(msg, functionToName!func ~ ` as ` ~ UDAs[0].name);
 	}else{
 		string name = functionToName!func;
-		//pragma(msg, functionToName!func);
 	}
-
-	// registering stuff
-
-	//pragma(msg, makeParamsStruct!func);
 	mixin(makeParamsStruct!func);
 
 	auto wrapper = function string(const string json){
@@ -104,16 +98,13 @@ void registerFunction(alias func)()
 		import std.conv;
 		ParamStruct params = fromJSON!ParamStruct(parseJSON(json));
 
-		//auto result = mixin(`func(` ~ explodeParamsStruct!(func, "params") ~ `)`);
-
 		immutable string call = `func(` ~ explodeParamsStruct!(func, "params") ~ `)`;
-		//pragma(msg, `call: ` ~ call);
 
 		alias ResultOf = ReturnType!func;
 
 		static if(is(ResultOf == void)){
 			Result!string res;
-			mixin(call ~ ";"); // why is this ~ ";" needed?
+			mixin(call);
 		}else{
 			Result!ResultOf res;
 			res.Result = mixin(call);
@@ -122,16 +113,11 @@ void registerFunction(alias func)()
 	};
 
 	registry.register(name, wrapper);
-
-	//pragma(msg, ParamStruct.codeof);
-
 }
 
 public string registerFunctionsImpl(alias Module)()
 {
 	import std.stdio;
-	//pragma(msg, Module);
-	//mixin("import " ~ Module ~ ";");
 	string res = "shared static this () {\n" ~
 		"import std.stdio;\n" ~
 		"import std.traits;\n";
