@@ -10,13 +10,13 @@ public struct Result(T)
 	T Result;
 }
 
-public string call(immutable string name, immutable string json){
+public string call(string name, string json){
 	return registry.call(name, json);
 }
 
 private struct Registry
 {
-	alias func = string function(const string);
+	alias func = string function(string);
 	
 	func[string] map;
 
@@ -92,7 +92,7 @@ void registerFunction(alias func)()
 	}
 	mixin(makeParamsStruct!func);
 
-	auto wrapper = function string(const string json){
+	auto wrapper = function string(string json){
 		import painlessjson : fromJSON, toJSON;
 		import std.json : parseJSON;
 		import std.conv;
