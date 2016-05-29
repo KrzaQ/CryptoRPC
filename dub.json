@@ -1,0 +1,10 @@
+{
+	"name": "cryptorpc",
+	"description": "CryptoRPC",
+	"License": "MIT",
+	"copyright": "Copyright © 2016, KrzaQ",
+	"authors": ["KrzaQ"],
+	"dependencies": {
+		"painlessjson": "*"
+	}
+}
