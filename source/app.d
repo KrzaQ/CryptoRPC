@@ -1,10 +1,20 @@
 import std.stdio;
 
-import cryptorpc;
+import deserializer;
+
 
 void foo()
 {
-	
+}
+
+@Register
+void bar()
+{
+}
+
+@Register("bazz")
+void baz()
+{
 }
 
 void main()
@@ -14,7 +24,7 @@ void main()
 
 shared static this()
 {
-	
+
 }
 
 mixin(registerFunctions);
