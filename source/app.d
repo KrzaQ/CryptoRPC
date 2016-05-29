@@ -13,7 +13,7 @@ void bar()
 }
 
 @Register("bazz")
-void baz()
+void baz(uint a, string b)
 {
 }
 
