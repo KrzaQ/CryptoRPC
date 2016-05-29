@@ -52,7 +52,7 @@ private string makeParamsStruct(alias func)()
 
 	static assert(ParamNames.length == ParamTypes.length);
 
-	string structDef = "struct ParamStruct{ \n";
+	string structDef = "static struct ParamStruct{ \n";
 	foreach(i, m; ParamNames){
 		structDef ~= `	` ~ ParamTypes[i].stringof ~ ` ` ~ m ~ ";\n";
 	}
