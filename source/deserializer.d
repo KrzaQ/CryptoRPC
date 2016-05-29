@@ -5,9 +5,9 @@ struct Register
 	string name;
 }
 
-public struct Result
+public struct Result(T)
 {
-	string Result;
+	T Result;
 }
 
 public string call(immutable string name, immutable string json){
@@ -20,7 +20,7 @@ private struct Registry
 	
 	func[string] map;
 
-	void register(string name, func f){
+	shared void register(string name, func f){
 		if(name in map){
 			import std.stdio;
 			stderr.writefln("Function '%s' already registered.", name);
@@ -61,6 +61,25 @@ private string makeParamsStruct(alias func)()
 	return structDef;
 }
 
+private string explodeParamsStruct(alias func, string structName)()
+{
+	import std.traits;
+	alias ParamNames = ParameterIdentifierTuple!func;
+	alias ParamTypes = Parameters!func;
+
+	static assert(ParamNames.length == ParamTypes.length);
+
+	static if(ParamTypes.length == 0){
+		return "";
+	}else{
+		string ret = structName ~ "." ~ ParamNames[0];
+		foreach(i, m; ParamNames[1..$]){
+			ret ~= ", " ~ structName ~ "." ~ m;
+		}
+		return ret;
+	}
+}
+
 void registerFunction(alias func)()
 {
 	import std.traits;
@@ -68,23 +87,41 @@ void registerFunction(alias func)()
 
 	static if(UDAs.length == 1){
 		string name = UDAs[0].name;
-		pragma(msg, functionToName!func ~ ` as ` ~ UDAs[0].name);
+		//pragma(msg, functionToName!func ~ ` as ` ~ UDAs[0].name);
 	}else{
 		string name = functionToName!func;
-		pragma(msg, functionToName!func);
+		//pragma(msg, functionToName!func);
 	}
 
 	// registering stuff
 
-	pragma(msg, makeParamsStruct!func);
+	//pragma(msg, makeParamsStruct!func);
 	mixin(makeParamsStruct!func);
 
-	auto wrapper = function string(string json){
-		import painlessjson : fromJSON;
-		import std.json;
+	auto wrapper = function string(const string json){
+		import painlessjson : fromJSON, toJSON;
+		import std.json : parseJSON;
+		import std.conv;
 		ParamStruct params = fromJSON!ParamStruct(parseJSON(json));
-		return "";
+
+		//auto result = mixin(`func(` ~ explodeParamsStruct!(func, "params") ~ `)`);
+
+		immutable string call = `func(` ~ explodeParamsStruct!(func, "params") ~ `)`;
+		//pragma(msg, `call: ` ~ call);
+
+		alias ResultOf = ReturnType!func;
+
+		static if(is(ResultOf == void)){
+			Result!string res;
+			mixin(call ~ ";"); // why is this ~ ";" needed?
+		}else{
+			Result!ResultOf res;
+			res.Result = mixin(call);
+		}
+		return res.toJSON.to!string;
 	};
+
+	registry.register(name, wrapper);
 
 	//pragma(msg, ParamStruct.codeof);
 

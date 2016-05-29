@@ -2,29 +2,40 @@ import std.stdio;
 
 import deserializer;
 
-
-void foo()
+@Register(`pow`)
+double myPow(double b, double e)
 {
+	import std.math;
+	return b.pow(e);
 }
 
 @Register
-void bar()
+int makeItDouble(int value)
 {
-}
-
-@Register("bazz")
-void baz(uint a, string b)
-{
+	return 2*value;
 }
 
 void main()
 {
+	auto powInput = q{{
+		"b": 2,
+		"e": 10
+	}};
+
+	auto midInput = q{{
+		"value": 21
+	}};
+
+	auto powResult = deserializer.call("pow", powInput);
+	auto midResult = deserializer.call("makeItDouble", midInput);
+
+	powResult.writeln;
+	midResult.writeln;
+	
+	assert(powResult == `{"Result":1024}`);
+	assert(midResult == `{"Result":42}`);
 }
 
 
-shared static this()
-{
-
-}
 
 mixin(registerFunctions);
