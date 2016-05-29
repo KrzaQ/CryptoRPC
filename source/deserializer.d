@@ -82,7 +82,7 @@ void registerFunction(alias func)()
 		alias ParamTypes = Parameters!func;
 		ParamTypes ps;
 
-		foreach(i, string fldname; __traits(allMembers, ParamStruct)){
+		foreach(i, string fldname; FieldNameTuple!ParamStruct){
 			ps[i] = __traits(getMember, params, fldname);
 		}
 
