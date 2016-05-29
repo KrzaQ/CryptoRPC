@@ -1,6 +1,6 @@
 import std.stdio;
 
-import deserializer;
+import registry;
 
 @Register(`pow`)
 double myPow(double b, double e)
@@ -27,7 +27,7 @@ void main()
 	}};
 
 	auto powResult = "pow".call(powInput);
-	auto midResult = deserializer.call("makeItDouble", midInput);
+	auto midResult = registry.call("makeItDouble", midInput);
 
 	powResult.writeln;
 	midResult.writeln;

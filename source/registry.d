@@ -1,4 +1,4 @@
-module deserializer;
+module registry;
 
 struct Register
 {
@@ -119,4 +119,4 @@ public string registerFunctionsImpl(alias Module)()
 	return res;
 }
 
-enum registerFunctions = "static import deserializer; mixin(deserializer.registerFunctionsImpl!(mixin(__MODULE__)));";
+enum registerFunctions = "static import registry; mixin(registry.registerFunctionsImpl!(mixin(__MODULE__)));";
